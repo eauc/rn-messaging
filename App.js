@@ -9,8 +9,9 @@ import {
   BackHandler,
 } from 'react-native';
 
-import Status from './components/Status';
+import ImageGrid from './components/ImageGrid';
 import MessageList from './components/MessageList';
+import Status from './components/Status';
 import Toolbar from './components/Toolbar';
 import { createImageMessage, createLocationMessage, createTextMessage } from './utils/MessageUtils';
 
@@ -130,6 +131,13 @@ export default class App extends React.Component {
     });
   };
 
+  handlePressImage = (uri) => {
+    const { messages } = this.state;
+    this.setState({
+      messages: [createImageMessage(uri), ...messages],
+    });
+  };
+
   renderMessageList() {
     const { messages } = this.state;
     return (
@@ -139,11 +147,11 @@ export default class App extends React.Component {
     );
   }
 
-  renderInputMethodEditor() {
-    return (
-      <View style={styles.inputMethodEditor}></View>
-    );
-  }
+  renderInputMethodEditor = () => (
+    <View style={styles.inputMethodEditor}>
+      <ImageGrid onPressImage={this.handlePressImage} />
+    </View>
+  );
 
   renderToolbar() {
     const { isInputFocused } = this.state;
