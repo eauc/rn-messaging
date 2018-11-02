@@ -10,6 +10,9 @@ import {
 } from 'react-native';
 
 import ImageGrid from './components/ImageGrid';
+import KeyboardState from './components/KeyboardState';
+import MeasureLayout from './components/MeasureLayout';
+import MessagingContainer, { INPUT_METHOD } from './components/MessagingContainer';
 import MessageList from './components/MessageList';
 import Status from './components/Status';
 import Toolbar from './components/Toolbar';
@@ -43,6 +46,7 @@ export default class App extends React.Component {
     ],
     fullscreenImageId: null,
     isInputFocused: false,
+    inputMethod: INPUT_METHOD.NONE,
   };
 
   dismissFullscreenImage = () => {
@@ -96,13 +100,16 @@ export default class App extends React.Component {
     );
   };
 
-  handlePressToolbarCamera = () => {
-    // ...
-  }
+  handleChangeInputMethod = (inputMethod) => {
+    this.setState({ inputMethod });
+  };
 
-  handlePressToolbarLocation = () => {
-    // ...
-  }
+  handlePressToolbarCamera = () => {
+    this.setState({
+      isInputFocused: false,
+      inputMethod: INPUT_METHOD.CUSTOM,
+    });
+  };
 
   handleChangeFocus = (isFocused) => {
     this.setState({ isInputFocused: isFocused });
@@ -169,12 +176,28 @@ export default class App extends React.Component {
   }
 
   render() {
+    const { inputMethod } = this.state;
+
     return (
       <View style={styles.container}>
         <Status />
-        {this.renderMessageList()}
-        {this.renderToolbar()}
-        {this.renderInputMethodEditor()}
+        <MeasureLayout>
+          {layout => (
+            <KeyboardState layout={layout}>
+              {keyboardInfo => (
+                <MessagingContainer
+                  {...keyboardInfo}
+                  inputMethod={inputMethod}
+                  onChangeInputMethod={this.handleChangeInputMethod}
+                  renderInputMethodEditor={this.renderInputMethodEditor}
+                  >
+                  {this.renderMessageList()}
+                  {this.renderToolbar()}
+                </MessagingContainer>
+              )}
+            </KeyboardState>
+          )}
+      </MeasureLayout>
         {this.renderFullscreenImage()}
       </View>
     );
